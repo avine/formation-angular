@@ -11,12 +11,15 @@
 
   <h2 class="h4">Catalogue</h2>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <app-product class="col" [product]="products[0]" (addToBasket)="addToBasket($event)" />
-    <app-product class="col" [product]="products[1]" (addToBasket)="addToBasket($event)" />
-    <app-product class="col" [product]="products[2]" (addToBasket)="addToBasket($event)" />
-    <app-product class="col" [product]="products[3]" (addToBasket)="addToBasket($event)" />
+  <div *ngIf="hasProductsInStock; else stockEmpty" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <ng-container *ngFor="let product of products">
+      <app-product *ngIf="product.stock" class="col" [product]="product" (addToBasket)="addToBasket($event)" />
+    </ng-container>
   </div>
+
+  <ng-template #stockEmpty>
+    <p class="fst-italic text-secondary">Désolé, notre stock est vide !</p>
+  </ng-template>
 </main>
 
 <app-footer />

@@ -45,4 +45,15 @@ describe('ProductComponent', () => {
 
     expect(addToBasketSpy).toHaveBeenCalledWith(component.product);
   });
+
+  it('should not add the "text-bg-warning" className when stock is greater than 1', () => {
+    expect((fixture.nativeElement as HTMLElement).querySelector('.card')?.className).not.toContain('text-bg-warning');
+  });
+
+  it('should add the "text-bg-warning" className when stock is equal to 1', () => {
+    component.product.stock = 1;
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('.card')?.className).toContain('text-bg-warning');
+  });
 });

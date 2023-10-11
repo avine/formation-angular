@@ -46,4 +46,34 @@ describe('AppComponent', () => {
     component.addToBasket({ price: 2 } as Product);
     expect(component.total).toBe(3);
   });
+
+  it('should decrease the stock of the product added to the basket', () => {
+    expect(component.products[0].stock).toBe(2);
+
+    const productDebugElement = fixture.debugElement.query(By.css('app-product'));
+    productDebugElement.triggerEventHandler('addToBasket', productDebugElement.properties['product']);
+
+    expect(component.products[0].stock).toBe(1);
+  });
+
+  it('should not display products whose stock is empty', () => {
+    component.products[0].stock = 0;
+    fixture.detectChanges();
+
+    const productDebugElements = fixture.debugElement.queryAll(By.css('app-product'));
+    expect(productDebugElements[0].properties['product']).toBe(component.products[1]);
+    expect(productDebugElements[1].properties['product']).toBe(component.products[2]);
+    expect(productDebugElements[2].properties['product']).toBe(component.products[3]);
+  });
+
+  it('should display a message when stock is completely empty', () => {
+    expect((fixture.nativeElement as HTMLElement).querySelector('.text-secondary')).toBeNull();
+
+    component.products.forEach((product) => (product.stock = 0));
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('.text-secondary')?.textContent).toContain(
+      'Désolé, notre stock est vide !',
+    );
+  });
 });

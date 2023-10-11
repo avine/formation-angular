@@ -44,7 +44,12 @@ export class AppComponent {
 
   total = 0;
 
-  addToBasket({ price }: Product) {
-    this.total += price;
+  get hasProductsInStock(): boolean {
+    return this.products.some(({ stock }) => stock > 0);
+  }
+
+  addToBasket(product: Product) {
+    product.stock -= 1;
+    this.total += product.price;
   }
 }
