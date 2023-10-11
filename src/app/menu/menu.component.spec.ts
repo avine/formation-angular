@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { BasketService } from '../basket/basket.service';
+import { BasketStubService } from '../basket/basket.service.stub';
+import { BasketItem } from '../basket/basket.types';
 import { MenuComponent } from './menu.component';
 
 describe('MenuComponent', () => {
@@ -9,6 +12,7 @@ describe('MenuComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [MenuComponent],
+      providers: [{ provide: BasketService, useClass: BasketStubService }],
     });
     fixture = TestBed.createComponent(MenuComponent);
     component = fixture.componentInstance;
@@ -17,5 +21,14 @@ describe('MenuComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should display the number of items', () => {
+    (TestBed.inject(BasketService) as BasketStubService).items = [{} as BasketItem, {} as BasketItem];
+
+    expect(component.numberOfItems).toBe(2);
+
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.badge')?.textContent).toContain('2');
   });
 });

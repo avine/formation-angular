@@ -2,6 +2,10 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
+import { BasketService } from './basket/basket.service';
+import { BasketStubService } from './basket/basket.service.stub';
+import { CatalogService } from './catalog/catalog.service';
+import { CatalogStubService } from './catalog/catalog.service.stub';
 import { Product } from './product/product.types';
 
 describe('AppComponent', () => {
@@ -11,6 +15,10 @@ describe('AppComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
+      providers: [
+        { provide: CatalogService, useClass: CatalogStubService },
+        { provide: BasketService, useClass: BasketStubService },
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
     fixture = TestBed.createComponent(AppComponent);
@@ -22,6 +30,11 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should display the app title', () => {
+    const appTitle = (fixture.nativeElement.querySelector('h1') as HTMLElement).textContent;
+    expect(appTitle).toContain('Bienvenue sur Zenika Ecommerce');
+  });
+
   it('should display the products', () => {
     const productDebugElements = fixture.debugElement.queryAll(By.css('app-product'));
     productDebugElements.forEach((productDebugElement, index) => {
@@ -29,47 +42,30 @@ describe('AppComponent', () => {
     });
   });
 
-  it('should update the total when "addToBasket" class method is called', () => {
+  it('should not display products whose stock is empty', () => {
     const productDebugElements = fixture.debugElement.queryAll(By.css('app-product'));
-    productDebugElements[0].triggerEventHandler('addToBasket', productDebugElements[0].properties['product']);
-    fixture.detectChanges();
-
-    expect((fixture.nativeElement as HTMLElement).querySelector('header p')?.textContent).toContain(
-      `Votre panier s'élève à ${component.products[0].price} €`,
-    );
+    expect(productDebugElements).toHaveSize(2);
+    productDebugElements.forEach((productDebugElement) => {
+      expect((productDebugElement.properties['product'] as Product).stock).not.toBe(0);
+    });
   });
 
-  it('should update the total when a product emits the "addToBasket" event', () => {
-    component.addToBasket({ price: 1 } as Product);
-    expect(component.total).toBe(1);
-
-    component.addToBasket({ price: 2 } as Product);
-    expect(component.total).toBe(3);
-  });
-
-  it('should decrease the stock of the product added to the basket', () => {
-    expect(component.products[0].stock).toBe(2);
+  it('should call "CatalogService.decreaseStock" and "BasketService.addItem" methods when a product is added to the basket', () => {
+    const decreaseStockSpy = spyOn(TestBed.inject(CatalogService), 'decreaseStock').and.returnValue(true);
+    const addItemSpy = spyOn(TestBed.inject(BasketService), 'addItem');
 
     const productDebugElement = fixture.debugElement.query(By.css('app-product'));
     productDebugElement.triggerEventHandler('addToBasket', productDebugElement.properties['product']);
 
-    expect(component.products[0].stock).toBe(1);
-  });
-
-  it('should not display products whose stock is empty', () => {
-    component.products[0].stock = 0;
-    fixture.detectChanges();
-
-    const productDebugElements = fixture.debugElement.queryAll(By.css('app-product'));
-    expect(productDebugElements[0].properties['product']).toBe(component.products[1]);
-    expect(productDebugElements[1].properties['product']).toBe(component.products[2]);
-    expect(productDebugElements[2].properties['product']).toBe(component.products[3]);
+    const { id, title, price } = component.products[0];
+    expect(decreaseStockSpy).toHaveBeenCalledWith(id);
+    expect(addItemSpy).toHaveBeenCalledWith({ id, title, price });
   });
 
   it('should display a message when stock is completely empty', () => {
     expect((fixture.nativeElement as HTMLElement).querySelector('.text-secondary')).toBeNull();
 
-    component.products.forEach((product) => (product.stock = 0));
+    (TestBed.inject(CatalogService) as CatalogStubService).hasProductsInStock = false;
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).querySelector('.text-secondary')?.textContent).toContain(
