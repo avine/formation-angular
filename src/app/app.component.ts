@@ -3,6 +3,7 @@ import { APP_TITLE } from './app.token';
 import { BasketService } from './basket/basket.service';
 import { CatalogService } from './catalog/catalog.service';
 import { Product } from './product/product.types';
+import { SelectProductKey } from './select-product-key/select-product-key.types';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,8 @@ export class AppComponent {
   get total() {
     return this.basketService.total;
   }
+
+  productKey: SelectProductKey = undefined;
 
   constructor(
     private catalogService: CatalogService,

@@ -7,6 +7,7 @@ import { BasketStubService } from './basket/basket.service.stub';
 import { CatalogService } from './catalog/catalog.service';
 import { CatalogStubService } from './catalog/catalog.service.stub';
 import { Product } from './product/product.types';
+import { SortProductsPipe } from './sort-products/sort-products.pipe';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -14,7 +15,7 @@ describe('AppComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
+      declarations: [AppComponent, SortProductsPipe],
       providers: [
         { provide: CatalogService, useClass: CatalogStubService },
         { provide: BasketService, useClass: BasketStubService },
