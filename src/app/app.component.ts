@@ -11,17 +11,11 @@ import { SelectProductKey } from './select-product-key/select-product-key.types'
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  get products() {
-    return this.catalogService.products;
-  }
+  products$ = this.catalogService.products$;
 
-  get hasProductsInStock() {
-    return this.catalogService.hasProductsInStock;
-  }
+  hasProductsInStock$ = this.catalogService.hasProductsInStock$;
 
-  get total() {
-    return this.basketService.total;
-  }
+  total$ = this.basketService.total$;
 
   productKey: SelectProductKey = undefined;
 

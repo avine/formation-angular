@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { map } from 'rxjs';
 import { BasketService } from '../basket/basket.service';
 
 @Component({
@@ -7,9 +8,7 @@ import { BasketService } from '../basket/basket.service';
   styleUrls: ['./menu.component.css'],
 })
 export class MenuComponent {
-  get numberOfItems() {
-    return this.basketService.items.length;
-  }
+  numberOfItems$ = this.basketService.items$.pipe(map(({ length }) => length));
 
   constructor(private basketService: BasketService) {}
 }

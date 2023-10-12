@@ -9,7 +9,9 @@
       <li class="nav-item">
         <a class="nav-link position-relative">
           Voir mon panier
-          <span class="position-absolute top-0 start-100 translate-middle badge bg-dark">{{ numberOfItems }}</span>
+          <span class="position-absolute top-0 start-100 translate-middle badge bg-dark">
+            {{ numberOfItems$ | async }}
+          </span>
         </a>
       </li>
     </ul>
