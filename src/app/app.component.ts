@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { APP_TITLE } from './app.token';
 import { BasketService } from './basket/basket.service';
 import { CatalogService } from './catalog/catalog.service';
@@ -10,7 +10,7 @@ import { SelectProductKey } from './select-product-key/select-product-key.types'
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   get products() {
     return this.catalogService.products;
   }
@@ -31,9 +31,12 @@ export class AppComponent {
     @Inject(APP_TITLE) public appTitle: string,
   ) {}
 
-  addToBasket({ id, title, price }: Product) {
-    if (this.catalogService.decreaseStock(id)) {
-      this.basketService.addItem({ id, title, price });
-    }
+  ngOnInit(): void {
+    this.catalogService.fetchProducts().subscribe();
+    this.basketService.fetchBasket().subscribe();
+  }
+
+  addToBasket({ id }: Product) {
+    this.basketService.addItem(id).subscribe(() => this.catalogService.decreaseStock(id));
   }
 }
